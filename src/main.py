@@ -33,11 +33,22 @@ def run():
     data_clients = merge_and_deduplicate(data_clients, "clients", "client_id")
     data_instruments = merge_and_deduplicate(data_instruments, "instruments", "instrument_id")
 
+    # --- Data Validation ---
+    data_trades["instrument_id"] = data_trades["instrument_id"].astype(str).str.strip()
+    data_instruments["instrument_id"] = data_instruments["instrument_id"].astype(str).str.strip()
+
+    data_trades["client_id"] = data_trades["client_id"].astype(str).str.strip()
+    data_clients["client_id"] = data_clients["client_id"].astype(str).str.strip()
+    valid_trades = data_trades[
+        data_trades["instrument_id"].isin(data_instruments["instrument_id"]) &
+        data_trades["client_id"].isin(data_clients["client_id"])
+        ]
+
     #Load (save to database)
     try:
         load_table(data_clients, "clients",engine)
         load_table(data_instruments, "instruments",engine)
-        load_table(data_trades, "trades",engine)
+        load_table(valid_trades, "trades",engine)
     except Exception as e:
         logger.error(f"Failed loading data into database: {e}")
         raise
