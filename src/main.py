@@ -34,11 +34,6 @@ def run():
     data_instruments = merge_and_deduplicate(data_instruments, "instruments", "instrument_id")
 
     # --- Data Validation ---
-    data_trades["instrument_id"] = data_trades["instrument_id"].astype(str).str.strip()
-    data_instruments["instrument_id"] = data_instruments["instrument_id"].astype(str).str.strip()
-
-    data_trades["client_id"] = data_trades["client_id"].astype(str).str.strip()
-    data_clients["client_id"] = data_clients["client_id"].astype(str).str.strip()
     valid_trades = data_trades[
         data_trades["instrument_id"].isin(data_instruments["instrument_id"]) &
         data_trades["client_id"].isin(data_clients["client_id"])
